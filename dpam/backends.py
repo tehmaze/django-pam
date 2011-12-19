@@ -10,13 +10,14 @@ class PAMBackend:
                 user = User.objects.get(username=username)
             except:
                 user = User(username=username, password='not stored here')
-                
+                user.set_unusable_password()
+
                 if getattr(settings, 'PAM_IS_SUPERUSER', False):
                   user.is_superuser = True
-                  
+
                 if getattr(settings, 'PAM_IS_STAFF', user.is_superuser):
                   user.is_staff = True
-                
+
                 user.save()
             return user
         return None
@@ -26,4 +27,3 @@ class PAMBackend:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
-        
