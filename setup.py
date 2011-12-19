@@ -6,5 +6,6 @@ setup(name='django-pam',
       author='Weston Nielson',
       author_email='wnielson@gmail.com',
       url='http://bitbucket.org/wnielson/django-pam',
+      license='MIT',
       packages=find_packages(),
      )
