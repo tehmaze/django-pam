@@ -2,8 +2,9 @@ import pam
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.backends import ModelBackend
 
-class PAMBackend:
+class PAMBackend(ModelBackend):
     def authenticate(self, username=None, password=None):
         if pam.authenticate(username, password):
             try:
