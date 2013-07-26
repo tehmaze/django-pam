@@ -5,8 +5,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.backends import ModelBackend
 
 class PAMBackend(ModelBackend):
+
+    SERVICE = getattr(settings, 'PAM_SERVICE', 'login')
+
     def authenticate(self, username=None, password=None):
-        if pam.authenticate(username, password):
+        if pam.authenticate(username, password, service=service):
             try:
                 user = User.objects.get(username=username)
             except:
