@@ -6,9 +6,9 @@ from django.contrib.auth.backends import ModelBackend
 
 class PAMBackend(ModelBackend):
 
-    SERVICE = getattr(settings, 'PAM_SERVICE', 'login')
 
     def authenticate(self, username=None, password=None):
+        service = getattr(settings, 'PAM_SERVICE', 'login')
         if pam.authenticate(username, password, service=service):
             try:
                 user = User.objects.get(username=username)
