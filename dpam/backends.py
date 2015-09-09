@@ -13,6 +13,8 @@ class PAMBackend(ModelBackend):
         try:
             user = User.objects.get(username=username)
         except:
+            if not getattr(settings, "PAM_CREATE_USER", True):
+                return None
             user = User(username=username, password='not stored here')
             user.set_unusable_password()
 
