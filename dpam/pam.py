@@ -129,10 +129,8 @@ def authenticate(username, password, service='login',  enable_acct_mgrt=False):
         return False
 
     retval = PAM_AUTHENTICATE(handle, 0)
-    if retval != 0:
-        return False
 
-    if enable_acct_mgrt:
+    if retval == 0 and enable_acct_mgrt:
         retval = PAM_ACCT_MGMT(handle, 0)
 
     PAM_END(handle, retval)
