@@ -82,16 +82,29 @@ PAM_AUTHENTICATE = LIBPAM.pam_authenticate
 PAM_AUTHENTICATE.restype = c_int
 PAM_AUTHENTICATE.argtypes = [PamHandle, c_int]
 
-def authenticate(username, password, service='login'):
+PAM_ACCT_MGMT = LIBPAM.pam_acct_mgmt
+PAM_ACCT_MGMT.restype = c_int
+PAM_ACCT_MGMT.argtypes = [PamHandle, c_int]
+
+PAM_END = LIBPAM.pam_end
+PAM_END.restype = c_int
+PAM_END.argtypes = [PamHandle, c_int]
+
+
+
+def authenticate(username, password, service='login',  enable_acct_mgrt=False):
     """Returns True if the given username and password authenticate for the
     given service.  Returns False otherwise
-    
+
     ``username``: the username to authenticate
-    
+
     ``password``: the password in plain text
-    
+
     ``service``: the PAM service to authenticate against.
-                 Defaults to 'login'"""
+                 Defaults to 'login'
+
+    ``enable_acct_mgrt``: call pam_acct_mgrt to check authorization, default to False"""
+
     @CONV_FUNC
     def my_conv(n_messages, messages, p_response, app_data):
         """Simple conversation function that responds to any
@@ -116,6 +129,12 @@ def authenticate(username, password, service='login'):
         return False
 
     retval = PAM_AUTHENTICATE(handle, 0)
+
+    if retval == 0 and enable_acct_mgrt:
+        retval = PAM_ACCT_MGMT(handle, 0)
+
+    PAM_END(handle, retval)
+
     return retval == 0
 
 if __name__ == "__main__":
