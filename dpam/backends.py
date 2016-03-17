@@ -7,22 +7,25 @@ from django.contrib.auth.backends import ModelBackend
 class PAMBackend(ModelBackend):
     def authenticate(self, username=None, password=None):
         service = getattr(settings, 'PAM_SERVICE', 'login')
-        if pam.authenticate(username, password, service=service):
-            try:
-                user = User.objects.get(username=username)
-            except:
-                user = User(username=username, password='not stored here')
-                user.set_unusable_password()
+        if not pam.authenticate(username, password, service=service):
+            return None
 
-                if getattr(settings, 'PAM_IS_SUPERUSER', False):
-                  user.is_superuser = True
+        try:
+            user = User.objects.get(username=username)
+        except:
+            if not getattr(settings, "PAM_CREATE_USER", True):
+                return None
+            user = User(username=username, password='not stored here')
+            user.set_unusable_password()
 
-                if getattr(settings, 'PAM_IS_STAFF', user.is_superuser):
-                  user.is_staff = True
+            if getattr(settings, 'PAM_IS_SUPERUSER', False):
+              user.is_superuser = True
 
-                user.save()
-            return user
-        return None
+            if getattr(settings, 'PAM_IS_STAFF', user.is_superuser):
+              user.is_staff = True
+
+            user.save()
+        return user
 
     def get_user(self, user_id):
         try:
